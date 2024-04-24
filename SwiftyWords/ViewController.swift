@@ -25,7 +25,7 @@ class ViewController: UIViewController {
 
     override func loadView() {
         view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
         scoreLabel = UILabel()
         scoreLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -62,12 +62,16 @@ class ViewController: UIViewController {
         submit.translatesAutoresizingMaskIntoConstraints = false
         submit.setTitle("SUBMIT", for: .normal)
         submit.addTarget(self, action: #selector(submitTapped), for: .touchUpInside)
+        submit.layer.borderColor = UIColor.secondaryLabel.cgColor
+        submit.layer.borderWidth = 1
         view.addSubview(submit)
         
         let clear = UIButton(type: .system)
         clear.translatesAutoresizingMaskIntoConstraints = false
         clear.setTitle("CLEAR", for: .normal)
         clear.addTarget(self, action: #selector(clearTapped), for: .touchUpInside)
+        clear.layer.borderColor = UIColor.secondaryLabel.cgColor
+        clear.layer.borderWidth = 1
         view.addSubview(clear)
         
         // Container
@@ -135,6 +139,8 @@ class ViewController: UIViewController {
                 
                 // give the button some temporary so we can see it on-screen
                 letterButton.setTitle("WWW", for: .normal)
+                letterButton.layer.borderColor = UIColor.secondaryLabel.cgColor
+                letterButton.layer.borderWidth = 1
                 
                 // calculate the frame of this button using its column and row
                 let frame = CGRect(x: col * width, y: row * height, width: width, height: height)
@@ -169,19 +175,32 @@ class ViewController: UIViewController {
         if let solutionPosition = solutions.firstIndex(of: answerText) {
             activatedButtons.removeAll()
             
-            var splitAnswers = answersLabel.text?.components(separatedBy: "\n")
-            splitAnswers?[solutionPosition] = answerText
-            answersLabel.text = splitAnswers?.joined(separator: "\n")
+            guard var splitAnswers = answersLabel.text?.components(separatedBy: "\n") else { return }
+            splitAnswers[solutionPosition] = answerText
+            answersLabel.text = splitAnswers.joined(separator: "\n")
             
             currentAnswer.text = ""
             
             score += 1
             
-            if score % 7 == 0 {
+            if Set(solutions) == Set(splitAnswers) {
                 let ac = UIAlertController(title: "Well done!", message: "Are you ready for the next level?", preferredStyle: .alert)
                 ac.addAction(UIAlertAction(title: "Let's go!", style: .default, handler: levelUp))
                 present(ac, animated: true)
             }
+        } else {
+            let alertMessage: String
+            
+            if score > 0 {
+                score -= 1
+                alertMessage = "Your score has been reduced"
+            } else {
+                alertMessage = "Try again"
+            }
+            
+            let ac = UIAlertController(title: "Wrong answer", message: alertMessage, preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default))
+            present(ac, animated: true)
         }
     }
     

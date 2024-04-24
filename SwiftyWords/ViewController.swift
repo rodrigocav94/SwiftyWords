@@ -60,18 +60,14 @@ class ViewController: UIViewController {
         
         let submit = UIButton(type: .system)
         submit.translatesAutoresizingMaskIntoConstraints = false
-        submit.setTitle("SUBMIT", for: .normal)
+        submit.configuration = configureButton(title: "SUBMIT")
         submit.addTarget(self, action: #selector(submitTapped), for: .touchUpInside)
-        submit.layer.borderColor = UIColor.secondaryLabel.cgColor
-        submit.layer.borderWidth = 1
         view.addSubview(submit)
         
-        let clear = UIButton(type: .system)
+        let clear = UIButton(type: .custom)
         clear.translatesAutoresizingMaskIntoConstraints = false
-        clear.setTitle("CLEAR", for: .normal)
+        clear.configuration = configureButton(title: "CLEAR")
         clear.addTarget(self, action: #selector(clearTapped), for: .touchUpInside)
-        clear.layer.borderColor = UIColor.secondaryLabel.cgColor
-        clear.layer.borderWidth = 1
         view.addSubview(clear)
         
         // Container
@@ -262,6 +258,22 @@ class ViewController: UIViewController {
         for button in letterButtons {
             button.isHidden = false
         }
+    }
+    
+    func configureButton(title: String) -> UIButton.Configuration {
+        var configuration = UIButton.Configuration.plain()
+        configuration.attributedTitle = AttributedString(
+            title,
+            attributes: AttributeContainer(
+                [NSAttributedString.Key.font : UIFont.systemFont(ofSize: 22, weight: .heavy)])
+        )
+        configuration.background.backgroundColor = .tintColor
+        configuration.background.cornerRadius = 20
+        configuration.baseForegroundColor = .systemBackground
+        configuration.contentInsets = .init(top: 0, leading: 25, bottom: 0, trailing: 25)
+        configuration.background.strokeWidth = 2
+        configuration.background.strokeColor = .secondaryLabel
+        return configuration
     }
 }
 

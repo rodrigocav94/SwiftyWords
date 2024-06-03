@@ -18,7 +18,9 @@ class ViewController: UIViewController {
     
     var score = 0 {
         didSet {
-            scoreLabel.text = "Score \(score)"
+            scoreLabel.animateTransition {
+                self.scoreLabel.text = "Score \(self.score)"
+            }
         }
     }
     var level = 1
@@ -160,9 +162,16 @@ class ViewController: UIViewController {
     
     @objc func letterTapped(_ sender: UIButton) {
         guard let buttonTitle = sender.titleLabel?.text else { return }
-        currentAnswer.text = currentAnswer.text?.appending(buttonTitle)
+        currentAnswer.animateTransition {
+            self.currentAnswer.text = self.currentAnswer.text?.appending(buttonTitle)
+        }
         activatedButtons.append(sender)
-        sender.isHidden = true
+        UIView.animate {
+            sender.isEnabled = false
+            sender.alpha = 0
+        } completion: { _ in
+            sender.isEnabled = true
+        }
     }
     
     @objc func submitTapped(_ sender: UIButton) {
@@ -173,11 +182,17 @@ class ViewController: UIViewController {
             
             guard var splitAnswers = answersLabel.text?.components(separatedBy: "\n") else { return }
             splitAnswers[solutionPosition] = answerText
-            answersLabel.text = splitAnswers.joined(separator: "\n")
             
-            currentAnswer.text = ""
+            answersLabel.animateTransition {
+                self.answersLabel.text = splitAnswers.joined(separator: "\n")
+            }
+            
+            currentAnswer.animateTransition {
+                self.currentAnswer.text = ""
+            }
             
             score += 1
+            
             
             if Set(solutions) == Set(splitAnswers) {
                 let ac = UIAlertController(title: "Well done!", message: "Are you ready for the next level?", preferredStyle: .alert)
@@ -201,10 +216,15 @@ class ViewController: UIViewController {
     }
     
     @objc func clearTapped(_ sender: UIButton) {
-        currentAnswer.text = ""
+        currentAnswer.animateTransition {
+            self.currentAnswer.text = ""
+        }
         
         for button in activatedButtons {
-            button.isHidden = false
+            UIView.animate {
+                button.isEnabled = true
+                button.alpha = 1
+            }
         }
         
         activatedButtons.removeAll()
@@ -258,7 +278,10 @@ class ViewController: UIViewController {
         performSelector(inBackground: #selector(loadLevel), with: nil)
         
         for button in letterButtons {
-            button.isHidden = false
+            UIView.animate {
+                button.isEnabled = true
+                button.alpha = 1
+            }
         }
     }
     
@@ -278,4 +301,3 @@ class ViewController: UIViewController {
         return configuration
     }
 }
-
